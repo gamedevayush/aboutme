@@ -1,0 +1,12 @@
+/* Disable Text Selection */
+* {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Disable Pointer Events (Prevents Clicking/Inspecting) */
+body {
+    pointer-events: none;
+}
