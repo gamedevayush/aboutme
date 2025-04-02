@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.2/aframe/build/aframe-ar.min.js"></script>
+</head>
+<body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs
+             vr-mode-ui="enabled: false"
+             renderer="logarithmicDepthBuffer: true;"
+             loading-screen="enabled: false"
+             id="ar-scene">
+
+        <!-- Apna Marker Detect Karne Ka Setup -->
+        <a-marker type="pattern" url="image.patt" id="image-marker">
+
+            <!-- Yaha 3D Model Place Hoga -->
+            <a-entity id="fb-logo"
+                      gltf-model="url(fb_logo.glb)"
+                      position="0 0.5 0"
+                      scale="0.5 0.5 0.5"
+                      visible="false">
+            </a-entity>
+
+            <!-- Yaha Button Place Hoga -->
+            <a-plane id="fb-button"
+                     position="0 -0.3 0"
+                     width="1"
+                     height="0.5"
+                     color="blue"
+                     material="opacity: 0.8;"
+                     visible="false">
+
+                <a-text value="Open Facebook"
+                        align="center"
+                        color="white"
+                        position="0 0 0.1">
+                </a-text>
+            </a-plane>
+
+        </a-marker>
+
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+        console.log("🚀 AR.js Scene Initialized!");
+
+        // Debug Camera Initialization
+        document.querySelector("#ar-scene").addEventListener("loaded", function () {
+            console.log("📷 Camera initialized successfully!");
+        });
+
+        // Debug Marker Detection
+        let marker = document.querySelector("#image-marker");
+        marker.addEventListener("markerFound", function () {
+            console.log("✅ Marker detected! Loading model...");
+
+            // Show 3D Model & Button when marker is detected
+            document.querySelector("#fb-logo").setAttribute("visible", "true");
+            document.querySelector("#fb-button").setAttribute("visible", "true");
+        });
+
+        marker.addEventListener("markerLost", function () {
+            console.log("❌ Marker lost! Hiding model...");
+
+            // Hide elements when marker is lost
+            document.querySelector("#fb-logo").setAttribute("visible", "false");
+            document.querySelector("#fb-button").setAttribute("visible", "false");
+        });
+
+        // Debug Model Load
+        document.querySelector("#fb-logo").addEventListener("model-loaded", function () {
+            console.log("🎉 3D Model Loaded Successfully!");
+        });
+
+        // Jab bhi button pe click ho, Facebook open ho
+        document.querySelector("#fb-button").addEventListener("click", function () {
+            console.log("🖱️ Button Clicked! Opening Facebook...");
+            window.open("https://www.facebook.com", "_blank");
+        });
+
+        // Agar tu model pe click se kuch aur karwana chahta hai
+        document.querySelector("#fb-logo").addEventListener("click", function () {
+            console.log("🔥 3D Model Clicked!");
+            alert("3D Model Clicked! You can navigate somewhere.");
+        });
+    </script>
+</body>
+</html>
