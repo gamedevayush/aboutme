@@ -9,51 +9,46 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
   <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-    <!-- Add cursor for interaction -->
+    
+    <!-- Add a cursor for mobile interaction -->
     <a-entity cursor="rayOrigin: mouse"></a-entity>
+    
+    <!-- Add a raycaster for detecting clicks -->
+    <a-entity id="cameraRig" camera position="0 0 0">
+      <a-entity id="raycaster" raycaster="objects: .clickable" cursor="fuse: false;"></a-entity>
+    </a-entity>
 
     <!-- Marker for tracking -->
     <a-marker type="pattern" url="/aboutme/AR/pattern-hiro.patt">
-      <!-- Clickable Plane to display the image -->
+      <!-- Plane with Collider -->
       <a-plane id="imagePlane" 
+               class="clickable"
                position="0 0 0" 
                rotation="-90 0 0" 
                width="4" 
                height="2.25" 
-               material="shader: flat; scale: 2 2 2; src: capture.jpg"
-               class="clickable">
+               material="shader: flat; scale: 2 2 2; src: capture.jpg">
       </a-plane>
     </a-marker>
 
-    <!-- Camera to view the scene -->
-    <a-entity camera></a-entity>
   </a-scene>
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-        let imagePlane = document.querySelector("#imagePlane");
+        let raycaster = document.querySelector("#raycaster");
 
-        function handleTap(event) {
-            event.stopPropagation(); // Prevent any default behavior
-            event.preventDefault();  // Stops touch issues on iOS
-            console.log("✅ Image tapped! Redirecting...");
-
-            // **ACTUAL REDIRECTION ONLY ON TAP**
+        function handleClick(event) {
+            console.log("✅ Collider Clicked! Redirecting...");
             setTimeout(() => {
                 window.location.href = "https://gamedevayush.github.io"; // Change this to your link
-            }, 200); // Small delay for better UX
+            }, 200); // Small delay for smooth transition
         }
 
-        // Ensure proper event handling
-        if (imagePlane) {
-            console.log("🎯 Clickable object found, adding event listeners...");
-
-            imagePlane.addEventListener("click", handleTap);
-            imagePlane.addEventListener("touchend", handleTap, { passive: false });
-
-            console.log("✅ Event listeners added successfully.");
+        if (raycaster) {
+            console.log("🎯 Raycaster Ready. Adding event listener...");
+            raycaster.addEventListener("click", handleClick);
         } else {
-            console.error("❌ Error: Clickable object (imagePlane) NOT found.");
+            console.error("❌ Raycaster NOT found! Debug needed.");
         }
     });
   </script>
