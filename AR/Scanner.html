@@ -45,8 +45,16 @@
         }
 
         // Ensure proper event handling
-        imagePlane.addEventListener("click", handleTap);
-        imagePlane.addEventListener("touchend", handleTap, { passive: false });
+        if (imagePlane) {
+            console.log("🎯 Clickable object found, adding event listeners...");
+
+            imagePlane.addEventListener("click", handleTap);
+            imagePlane.addEventListener("touchend", handleTap, { passive: false });
+
+            console.log("✅ Event listeners added successfully.");
+        } else {
+            console.error("❌ Error: Clickable object (imagePlane) NOT found.");
+        }
     });
   </script>
 </body>
