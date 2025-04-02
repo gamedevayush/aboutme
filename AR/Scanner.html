@@ -33,15 +33,20 @@
     document.addEventListener("DOMContentLoaded", function() {
         let imagePlane = document.querySelector("#imagePlane");
 
-        // Ensure compatibility with both desktop (click) and mobile (touchstart)
         function handleTap(event) {
-            console.log("Tapped on image plane!"); // Debugging
-            window.location.href = "https://gamedevayush.github.io"; // Change to your desired URL
+            event.stopPropagation(); // Prevent any default behavior
+            event.preventDefault();  // Stops touch issues on iOS
+            console.log("✅ Image tapped! Redirecting...");
+
+            // **ACTUAL REDIRECTION ONLY ON TAP**
+            setTimeout(() => {
+                window.location.href = "https://gamedevayush.github.io"; // Change this to your link
+            }, 200); // Small delay for better UX
         }
 
-        // Add event listeners for both click and touch
+        // Ensure proper event handling
         imagePlane.addEventListener("click", handleTap);
-        imagePlane.addEventListener("touchstart", handleTap);
+        imagePlane.addEventListener("touchend", handleTap, { passive: false });
     });
   </script>
 </body>
