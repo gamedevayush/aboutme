@@ -1,12 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
-    <title>Three.js AR Clickable Plane</title>  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r120/three.js" integrity="sha512-QCGz+55D77J/HfFhwUYiQ1jMFoaW0ObpqJFV2YwKqn+QhxEqlLtvG/7QOMBcRl/G3wWdLXe3hQ2I5oyPBHLStA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ar.js/2.2.2/aframe-ar.min.js" integrity="sha512-Vwmkm1QOtdVNLuwkxaXXyB/aBY0lZvI4NTv+83gs+pU0HuZ2j3inyfgpMpJHYRS0O3PoHEhO6mKomMYBKXRMWw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="text/javascript" src="script.js"></script> 
+  <title>AR Scanner</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://rawgit.com/jeromeetienne/ar.js/1.7.2/aframe/build/aframe-ar.min.js"></script>
 </head>
-<body style="margin: 0; overflow: hidden">
+<body style="margin: 0; overflow: hidden;">
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <a-marker type="pattern" url="pattern-hiro.patt">
+      <a-box position="0 0.5 0" color="red"></a-box>
+    </a-marker>
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <script>
+    window.onload = function () {
+        const scene = new THREE.Scene();
+        const camera = new THREE.Camera();
+        scene.add(camera);
+
+        const renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        var ArToolkitSource = new THREEx.ArToolkitSource({
+            sourceType: "webcam",
+        });
+
+        ArToolkitSource.init(function () {
+            setTimeout(function () {
+                ArToolkitSource.onResizeElement();  
+                ArToolkitSource.copyElementSizeTo(renderer.domElement); // ✅ Correct method
+            }, 2000);
+        });
+
+        var ArToolkitContext = new THREEx.ArToolkitContext({
+            cameraParametersUrl: 'https://cdn.jsdelivr.net/gh/jeromeetienne/AR.js/aframe/examples/camera_para.dat',
+            detectionMode: 'color_matrix'
+        });
+
+        ArToolkitContext.init(function () {
+            camera.projectionMatrix.copy(ArToolkitContext.getProjectionMatrix());
+        });
+
+        var ArMarkerControls = new THREEx.ArMarkerControls(ArToolkitContext, camera, {
+            type: 'pattern',
+            patternUrl: 'pattern-hiro.patt',
+            changeMatrixMode: 'cameraTransformMatrix'
+        });
+
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshNormalMaterial({
+            transparent: true,
+            opacity: 0.5,
+            side: THREE.DoubleSide
+        });
+        const cube = new THREE.Mesh(geometry, material);
+        cube.position.y = geometry.parameters.height / 2;
+        scene.add(cube);
+
+        camera.position.z = 5;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ArToolkitContext.update(ArToolkitSource.domElement);
+            scene.visible = camera.visible;
+            renderer.render(scene, camera);
+        };
+
+        animate();
+    };
+  </script>
 </body>
 </html>
