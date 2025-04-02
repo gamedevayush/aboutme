@@ -22,7 +22,7 @@ window.onload = function () {
     });
 
     var ArToolkitContext = new THREEx.ArToolkitContext({
-        cameraParametersUrl: 'https://cdn.jsdelivr.net/gh/jeromeetienne/AR.js/aframe/examples/camera_para.dat',
+        cameraParametersUrl: 'camera_para.dat',
         detectionMode: 'color_matrix'
     });
 
