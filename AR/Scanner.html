@@ -2,73 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js AR Clickable Plane</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js@1.7.2/three.js/build/ar.min.js"></script>
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
+    <title>Three.js AR Clickable Plane</title>  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r120/three.js" integrity="sha512-QCGz+55D77J/HfFhwUYiQ1jMFoaW0ObpqJFV2YwKqn+QhxEqlLtvG/7QOMBcRl/G3wWdLXe3hQ2I5oyPBHLStA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ar.js/2.2.2/aframe-ar.min.js" integrity="sha512-Vwmkm1QOtdVNLuwkxaXXyB/aBY0lZvI4NTv+83gs+pU0HuZ2j3inyfgpMpJHYRS0O3PoHEhO6mKomMYBKXRMWw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript" src="script.js"></script> 
 </head>
-<body style="margin: 0; overflow: hidden;">
-    <script>
-        // Scene setup
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // AR.js setup
-        const arSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
-        arSource.init(() => setTimeout(() => onResize(), 1000));
-        window.addEventListener('resize', onResize);
-
-        function onResize() {
-            arSource.onResizeElement();
-            arSource.copyElementSizeTo(renderer.domElement);
-            if (arController) {
-                arSource.copyElementSizeTo(arController.canvas);
-            }
-        }
-
-        // AR Context
-        const arContext = new THREEx.ArToolkitContext({ cameraParametersUrl: "https://ar-js-org.github.io/AR.js/data/camera_para.dat", detectionMode: 'mono' });
-        arContext.init(() => camera.projectionMatrix.copy(arContext.getProjectionMatrix()));
-
-        // Marker
-        const marker = new THREEx.ArMarkerControls(arContext, camera, { type: 'pattern', patternUrl: "/aboutme/AR/pattern-hiro.patt" });
-        scene.visible = false;
-
-        // Plane (Clickable)
-        const planeGeometry = new THREE.PlaneGeometry(2, 2);
-        const planeMaterial = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('capture.jpg') });
-        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-        plane.rotation.x = -Math.PI / 2;
-        scene.add(plane);
-
-        // Raycaster for Click Detection
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        function onClick(event) {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObject(plane);
-            if (intersects.length > 0) {
-                window.location.href = "https://yourlink.com";  // Change your redirect link here
-            }
-        }
-
-        window.addEventListener("click", onClick);
-
-        // Animation loop
-        function animate() {
-            requestAnimationFrame(animate);
-            if (arSource.ready) arContext.update(arSource.domElement);
-            scene.visible = camera.visible;
-            renderer.render(scene, camera);
-        }
-
-        animate();
-    </script>
+<body style="margin: 0; overflow: hidden">
 </body>
 </html>
