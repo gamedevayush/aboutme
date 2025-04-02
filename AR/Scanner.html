@@ -1,12 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
-    <title>Three.js AR Clickable Plane</title>  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r120/three.js" integrity="sha512-QCGz+55D77J/HfFhwUYiQ1jMFoaW0ObpqJFV2YwKqn+QhxEqlLtvG/7QOMBcRl/G3wWdLXe3hQ2I5oyPBHLStA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ar.js/2.2.2/aframe-ar.min.js" integrity="sha512-Vwmkm1QOtdVNLuwkxaXXyB/aBY0lZvI4NTv+83gs+pU0HuZ2j3inyfgpMpJHYRS0O3PoHEhO6mKomMYBKXRMWw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="text/javascript" src="script.js"></script> 
+    <title>Scanner</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
 </head>
-<body style="margin: 0; overflow: hidden">
+<body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+        <!-- Add cursor for interaction -->
+        <a-entity cursor="rayOrigin: mouse"></a-entity>
+
+        <!-- Marker for tracking -->
+        <a-marker type="pattern" url="/aboutme/AR/pattern-hiro.patt">
+            <!-- Clickable Plane to display the image -->
+            <a-plane id="imagePlane"
+                     position="0 0 0"
+                     rotation="-90 0 0"
+                     width="4"
+                     height="2.25"
+                     material="shader: flat; scale: 2 2 2; src: capture.jpg"
+                     class="clickable">
+            </a-plane>
+        </a-marker>
+
+        <!-- Camera to view the scene -->
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+        // Wait for A-Frame to load
+        document.addEventListener("DOMContentLoaded", function () {
+            // Select the plane
+            let imagePlane = document.querySelector("#imagePlane");
+
+            // Add event listener for click
+            imagePlane.addEventListener("click", function () {
+                window.location.href = "https://gamedevayush.github.io"; // Change to your desired URL
+            });
+        });
+    </script>
 </body>
 </html>
