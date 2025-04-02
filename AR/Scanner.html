@@ -7,18 +7,13 @@
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
 </head>
-<title> V1</title>
+<title> V2</title>
 <body style="margin: 0; overflow: hidden;">
   <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
     
     <!-- Add a cursor for mobile interaction -->
     <a-entity cursor="rayOrigin: mouse"></a-entity>
     
-    <!-- Add a raycaster for detecting clicks -->
-    <a-entity id="cameraRig" camera position="0 0 0">
-      <a-entity id="raycaster" raycaster="objects: .clickable" cursor="fuse: false;"></a-entity>
-    </a-entity>
-
     <!-- Marker for tracking -->
     <a-marker type="pattern" url="/aboutme/AR/pattern-hiro.patt">
       <!-- Plane with Collider -->
@@ -32,24 +27,29 @@
       </a-plane>
     </a-marker>
 
+    <!-- Camera with Raycaster -->
+    <a-entity camera>
+      <a-entity cursor="fuse: false; rayOrigin: mouse;" raycaster="objects: .clickable"></a-entity>
+    </a-entity>
+
   </a-scene>
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-        let raycaster = document.querySelector("#raycaster");
+        let imagePlane = document.querySelector("#imagePlane");
 
         function handleClick(event) {
-            console.log("✅ Collider Clicked! Redirecting...");
+            console.log("✅ Collider Clicked on Plane! Redirecting...");
             setTimeout(() => {
                 window.location.href = "https://gamedevayush.github.io"; // Change this to your link
-            }, 6000); // Small delay for smooth transition
+            }, 200); // Small delay for smooth transition
         }
 
-        if (raycaster) {
-            console.log("🎯 Raycaster Ready. Adding event listener...");
-            raycaster.addEventListener("click", handleClick);
+        if (imagePlane) {
+            console.log("🎯 Collider Ready on Image Plane!");
+            imagePlane.addEventListener("click", handleClick);
         } else {
-            console.error("❌ Raycaster NOT found! Debug needed.");
+            console.error("❌ Plane NOT found! Debug needed.");
         }
     });
   </script>
