@@ -1,57 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scanner</title>
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js AR Clickable Plane</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js@1.7.2/three.js/build/ar.min.js"></script>
 </head>
-<title> V2</title>
 <body style="margin: 0; overflow: hidden;">
-  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-    
-    <!-- Add a cursor for mobile interaction -->
-    <a-entity cursor="rayOrigin: mouse"></a-entity>
-    
-    <!-- Marker for tracking -->
-    <a-marker type="pattern" url="/aboutme/AR/pattern-hiro.patt">
-      <!-- Plane with Collider -->
-      <a-plane id="imagePlane" 
-               class="clickable"
-               position="0 0 0" 
-               rotation="-90 0 0" 
-               width="4" 
-               height="2.25" 
-               material="shader: flat; scale: 2 2 2; src: capture.jpg">
-      </a-plane>
-    </a-marker>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-    <!-- Camera with Raycaster -->
-    <a-entity camera>
-      <a-entity cursor="fuse: false; rayOrigin: mouse;" raycaster="objects: .clickable"></a-entity>
-    </a-entity>
+        // AR.js setup
+        const arSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
+        arSource.init(() => setTimeout(() => onResize(), 1000));
+        window.addEventListener('resize', onResize);
 
-  </a-scene>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        let imagePlane = document.querySelector("#imagePlane");
-
-        function handleClick(event) {
-            console.log("✅ Collider Clicked on Plane! Redirecting...");
-            setTimeout(() => {
-                window.location.href = "https://gamedevayush.github.io"; // Change this to your link
-            }, 200); // Small delay for smooth transition
+        function onResize() {
+            arSource.onResizeElement();
+            arSource.copyElementSizeTo(renderer.domElement);
+            if (arController) {
+                arSource.copyElementSizeTo(arController.canvas);
+            }
         }
 
-        if (imagePlane) {
-            console.log("🎯 Collider Ready on Image Plane!");
-            imagePlane.addEventListener("click", handleClick);
-        } else {
-            console.error("❌ Plane NOT found! Debug needed.");
+        // AR Context
+        const arContext = new THREEx.ArToolkitContext({ cameraParametersUrl: "https://ar-js-org.github.io/AR.js/data/camera_para.dat", detectionMode: 'mono' });
+        arContext.init(() => camera.projectionMatrix.copy(arContext.getProjectionMatrix()));
+
+        // Marker
+        const marker = new THREEx.ArMarkerControls(arContext, camera, { type: 'pattern', patternUrl: "/aboutme/AR/pattern-hiro.patt" });
+        scene.visible = false;
+
+        // Plane (Clickable)
+        const planeGeometry = new THREE.PlaneGeometry(2, 2);
+        const planeMaterial = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('capture.jpg') });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = -Math.PI / 2;
+        scene.add(plane);
+
+        // Raycaster for Click Detection
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        function onClick(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObject(plane);
+            if (intersects.length > 0) {
+                window.location.href = "https://yourlink.com";  // Change your redirect link here
+            }
         }
-    });
-  </script>
+
+        window.addEventListener("click", onClick);
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            if (arSource.ready) arContext.update(arSource.domElement);
+            scene.visible = camera.visible;
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
 </body>
 </html>
