@@ -23,32 +23,9 @@
          data-raycastable>
 </a-plane>
         </a-marker>
-
-        <!-- Camera to view the scene -->
         <a-entity camera></a-entity>
     </a-scene>
 
-    <script>
-        // Wait for A-Frame to load
-        document.addEventListener("DOMContentLoaded", function () {
-            // Select the plane
-            let imagePlane = document.querySelector("#imagePlane");
-
-            // Add event listener for click
-            imagePlane.addEventListener("click", function (event) {
-                event.stopPropagation(); // Prevent the event from bubbling up
-                window.open("https://gamedevayush.github.io", "_blank"); // Opens the link in a new tab
-            });
-
-            // Optional: Add hover effect
-            imagePlane.addEventListener("mouseenter", function () {
-                imagePlane.setAttribute('material', 'color', 'yellow'); // Change color on hover
-            });
-
-            imagePlane.addEventListener("mouseleave", function () {
-                imagePlane.setAttribute('material', 'color', 'white'); // Reset color when not hovering
-            });
-        });
-    </script>
+   
 </body>
 </html>
