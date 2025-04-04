@@ -63,13 +63,13 @@
   <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
     <!-- Assets -->
     <a-assets>
-      <a-asset-item id="sidekick" src="char.glb"></a-asset-item>
-      <audio id="bgMusic" src="audio.mp3" preload="auto"></audio>
-      <img id="mainImage" src="poster.png"> <!-- your image -->
+      <a-asset-item id="sidekick" src="aboutme/AR/char.glb"></a-asset-item>
+      <audio id="bgMusic" src="aboutme/AR/audio.mp3" preload="auto"></audio>
+      <img id="mainImage" src="aboutme/AR/poster.jpg"> <!-- your image -->
     </a-assets>
 
     <!-- Marker -->
-    <a-marker id="mainMarker" type="pattern" url="/AR/pattern-hiro.patt">
+    <a-marker id="mainMarker" type="pattern" url="aboutme/AR/pattern-hiro.patt">
       
       <!-- Image instead of 3D model -->
       <a-image src="#mainImage"
