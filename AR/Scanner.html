@@ -61,6 +61,12 @@
 
   <!-- A-Frame Scene -->
   <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <a-entity light="type: ambient; color: #ffffff; intensity: 0.6"></a-entity>
+
+    <!-- Directional Light (jaise sunlight, model ke face pe direct padti hai) -->
+    <a-entity light="type: directional; color: #ffffff; intensity: 1"
+              position="0 2 1">
+    </a-entity>
     <!-- Assets -->
     <a-assets>
       <a-asset-item id="sidekick" src="char.glb"></a-asset-item>
@@ -83,7 +89,7 @@
                 position="1 0 -1"
                 scale="0.5 0.5 0.5"
                 rotation="0 0 0"
-                animation-mixer>
+                animation-mixer="clip: Armature|Armature|mixamo.com|Layer0; loop:true">
       </a-entity>
 
     </a-marker>
@@ -121,10 +127,9 @@
       const audio = document.querySelector('[sound]');
       audio.components.sound.playSound();
       const model = document.getElementById("sidekick");
-      model.addEventListener("model-loaded", () => {
   if (model.components["animation-mixer"]) {
     model.components["animation-mixer"].play();
-  }});
+  }
       // Show social links
       socialLinks.style.display = "flex";
     });
