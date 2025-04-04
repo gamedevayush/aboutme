@@ -55,8 +55,6 @@
 
 <body style="margin: 0; overflow: hidden;">
 
-  <!-- Tap to Start -->
-  <div id="startScreen">🔥 Tap to Start Experience</div>
 
   <!-- Social Media Buttons -->
   <div class="social-buttons" id="socialLinks">
@@ -64,8 +62,9 @@
     <a href="https://facebook.com/yourusername" target="_blank">📘 Facebook</a>
   </div>
 
-  <!-- A-Frame Scene -->
+  <!-- A-Frame Scene --><a-scene xr-mode-ui="enabled: false"></a-scene>
   <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    
     <a-entity light="type: ambient; color: #ffffff; intensity: 0.6"></a-entity>
 
     <!-- Directional Light (jaise sunlight, model ke face pe direct padti hai) -->
@@ -109,23 +108,11 @@
   <!-- Script -->
   <script>
     const marker = document.querySelector("#mainMarker");
-    const startScreen = document.getElementById("startScreen");
     const socialLinks = document.getElementById("socialLinks");
 
     // Show "Tap to Start" ONLY when marker is detected
     marker.addEventListener("markerFound", () => {
       console.log("Marker found! Showing start screen...");
-      startScreen.style.display = "flex";
-    });
-
-    marker.addEventListener("markerLost", () => {
-      console.log("Marker lost! Hiding UI...");
-      startScreen.style.display = "none";
-      socialLinks.style.display = "none";
-    });
-
-    // Start experience after tap
-    startScreen.addEventListener("click", function () {
       this.style.display = "none";
 
       // Play music
@@ -135,6 +122,13 @@
       // Show social links
       socialLinks.style.display = "flex";
     });
+
+    marker.addEventListener("markerLost", () => {
+      console.log("Marker lost! Hiding UI...");
+      startScreen.style.display = "none";
+      socialLinks.style.display = "none";
+    });
+
   </script>
 
 </body>
