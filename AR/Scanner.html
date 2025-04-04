@@ -73,16 +73,16 @@
       
       <!-- Image instead of 3D model -->
       <a-image src="#mainImage"
-               position="0 0 0"
-               rotation="-90 0 0"
+               position="0 0 -1"
+               rotation="0 0 0"
                scale="1.5 1.5 1.5">
       </a-image>
 
       <!-- Sidekick 3D Model -->
       <a-entity gltf-model="#sidekick"
-                position="1.5 0 -1"
-                scale="0.3 0.3 0.3"
-                rotation="0 90 0"
+                position="1 0 -1"
+                scale="0.5 0.5 0.5"
+                rotation="0 0 0"
                 animation-mixer>
       </a-entity>
 
@@ -120,7 +120,10 @@
       // Play music
       const audio = document.querySelector('[sound]');
       audio.components.sound.playSound();
-
+      const model = document.getElementById("sidekickModel");
+        if (model && model.components["animation-mixer"]) {
+          model.components["animation-mixer"].play();
+        }
       // Show social links
       socialLinks.style.display = "flex";
     });
