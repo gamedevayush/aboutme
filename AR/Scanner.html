@@ -13,6 +13,14 @@
     width: 0 !important;
     pointer-events: none !important;
   }
+  #a-enter-vr {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    pointer-events: none !important;
+  }
     #startScreen {
       position: absolute;
       width: 100%;
@@ -27,7 +35,7 @@
       cursor: pointer;
       display: none;
     }
-    a-enter-vr-button {
+    #a-enter-vr-button {
     display: none !important;
     opacity: 0 !important;
     height: 0 !important;
@@ -71,7 +79,6 @@
     <a href="https://facebook.com/yourusername" target="_blank">📘 Facebook</a>
   </div>
 
-  <!-- A-Frame Scene --><a-scene vr-mode-ui="enabled: false"></a-scene>
   <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
     
     <a-entity light="type: ambient; color: #ffffff; intensity: 0.6"></a-entity>
