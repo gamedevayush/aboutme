@@ -78,7 +78,6 @@
       <audio id="bgMusic" src="audio.mp3" preload="auto"></audio>
       <img id="mainImage" src="poster.jpg"> <!-- your image -->
     </a-assets>
-    <a-scene vr-mode-ui="enabled: false">
     <!-- Marker -->
     <a-marker id="mainMarker" type="pattern" url="pattern-hiro.patt">
       
@@ -94,8 +93,8 @@
                 position="1 0 -1"
                 scale="0.5 0.5 0.5"
                 rotation="0 0 0"
-                animation-mixer="clip: Key|Armature|Armature|mixamo.com|Layer0; loop:true"
-                animation-mixer="clip: Armature|Armature|Armature|mixamo.com|Layer0; loop:true">
+                animation-mixer="clip: Key|Armature|Armature|mixamo.com|Layer0, Armature|Armature|Armature|mixamo.com|Layer0; loop:true">
+            </a-entity>
       </a-entity>
 
     </a-marker>
