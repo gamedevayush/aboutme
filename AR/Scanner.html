@@ -1,31 +1,111 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Scanner</title>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
+  <title>AR Character Scene</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
+  <style>
+    #startScreen {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: black;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      z-index: 9999;
+      cursor: pointer;
+    }
+
+    .social-buttons {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9998;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .social-buttons a {
+      background: white;
+      color: black;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 1em;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: all 0.3s ease;
+    }
+
+    .social-buttons a:hover {
+      background: #222;
+      color: white;
+    }
+  </style>
 </head>
+
 <body style="margin: 0; overflow: hidden;">
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-        <!-- Add cursor for interaction -->
-        <a-entity cursor="rayOrigin: mouse" raycaster="objects: .clickable"></a-entity>
 
-        <!-- Marker for tracking -->
-        <a-marker type="pattern" url="/aboutme/AR/pattern-hiro.patt">
-            <!-- Clickable Plane to display the image -->
-            <a-plane id="imagePlane"
-         position="0 0 0"
-         rotation="-90 0 0"
-         width="4"
-         height="2.25"
-         material="shader: flat; scale: 2 2 2; src: capture.jpg"
-         class="clickable"
-         data-raycastable>
-</a-plane>
-        </a-marker>
-        <a-entity camera></a-entity>
-    </a-scene>
+  <!-- Tap to Start -->
+  <div id="startScreen">🔥 Tap to Start Experience</div>
 
-   
+  <!-- Social Media Buttons -->
+  <div class="social-buttons" style="display: none;" id="socialLinks">
+    <a href="https://instagram.com/ayushsingh8x" target="_blank">📸 Instagram</a>
+    <a href="https://facebook.com/yourusername" target="_blank">📘 Facebook</a>
+  </div>
+
+  <!-- A-Frame Scene -->
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <!-- Preload Assets -->
+    <a-assets>
+      <a-asset-item id="hero" src="main.glb"></a-asset-item>
+      <a-asset-item id="sidekick" src="char.glb"></a-asset-item>
+      <audio id="bgMusic" src="audio.mp3" preload="auto"></audio>
+    </a-assets>
+
+    <!-- Marker with Models -->
+    <a-marker type="pattern" url="/AR/pattern-hiro.patt">
+      <!-- Main Character -->
+      <a-entity gltf-model="#hero"
+                position="0 0 0"
+                scale="0.5 0.5 0.5"
+                rotation="0 180 0"
+                animation-mixer>
+      </a-entity>
+
+      <!-- Sidekick in Corner -->
+      <a-entity gltf-model="#sidekick"
+                position="2 0 -1"
+                scale="0.3 0.3 0.3"
+                rotation="0 90 0"
+                animation-mixer>
+      </a-entity>
+    </a-marker>
+
+    <!-- Camera -->
+    <a-entity camera></a-entity>
+
+    <!-- Background Music -->
+    <a-entity sound="src: #bgMusic; autoplay: false; loop: true"></a-entity>
+  </a-scene>
+
+  <!-- JS for Tap and UI -->
+  <script>
+    document.getElementById("startScreen").addEventListener("click", function () {
+      this.style.display = "none";
+
+      // Play audio
+      const audio = document.querySelector('[sound]');
+      audio.components.sound.playSound();
+
+      // Show social links
+      document.getElementById("socialLinks").style.display = "flex";
+    });
+  </script>
+
 </body>
 </html>
