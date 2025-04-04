@@ -19,7 +19,12 @@
       cursor: pointer;
       display: none;
     }
-
+    a-enter-vr {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+}
     .social-buttons {
       position: absolute;
       bottom: 20px;
@@ -64,8 +69,8 @@
     <a-entity light="type: ambient; color: #ffffff; intensity: 0.6"></a-entity>
 
     <!-- Directional Light (jaise sunlight, model ke face pe direct padti hai) -->
-    <a-entity light="type: directional; color: #ffffff; intensity: 1"
-              position="0 2 1">
+    <a-entity light="type: directional; color: #ffffff; intensity: 5"
+              position="0 -2 2">
     </a-entity>
     <!-- Assets -->
     <a-assets>
@@ -89,7 +94,8 @@
                 position="1 0 -1"
                 scale="0.5 0.5 0.5"
                 rotation="0 0 0"
-                animation-mixer="clip: Armature|Armature|mixamo.com|Layer0; loop:true">
+                animation-mixer="clip: Key|Armature|Armature|mixamo.com|Layer0; loop:true"
+                animation-mixer="clip: Armature|Armature|Armature|mixamo.com|Layer0; loop:true">
       </a-entity>
 
     </a-marker>
