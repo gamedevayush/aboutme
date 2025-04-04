@@ -113,7 +113,6 @@
     // Show "Tap to Start" ONLY when marker is detected
     marker.addEventListener("markerFound", () => {
       console.log("Marker found! Showing start screen...");
-      this.style.display = "none";
 
       // Play music
       const audio = document.querySelector('[sound]');
@@ -125,7 +124,6 @@
 
     marker.addEventListener("markerLost", () => {
       console.log("Marker lost! Hiding UI...");
-      startScreen.style.display = "none";
       socialLinks.style.display = "none";
     });
 
