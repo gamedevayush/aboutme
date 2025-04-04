@@ -5,6 +5,14 @@
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
   <style>
+    #arjsDebugUIContainer {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    pointer-events: none !important;
+  }
     #startScreen {
       position: absolute;
       width: 100%;
@@ -19,12 +27,13 @@
       cursor: pointer;
       display: none;
     }
-    a-enter-vr {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  height: 0 !important;
-  width: 0 !important;
-}
+    a-enter-vr-button {
+    display: none !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    pointer-events: none !important;
+  }
     .social-buttons {
       position: absolute;
       bottom: 20px;
@@ -62,7 +71,7 @@
     <a href="https://facebook.com/yourusername" target="_blank">📘 Facebook</a>
   </div>
 
-  <!-- A-Frame Scene --><a-scene xr-mode-ui="enabled: false"></a-scene>
+  <!-- A-Frame Scene --><a-scene vr-mode-ui="enabled: false"></a-scene>
   <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
     
     <a-entity light="type: ambient; color: #ffffff; intensity: 0.6"></a-entity>
@@ -128,6 +137,11 @@
     });
 
   </script>
-
+<script>
+    window.addEventListener('load', () => {
+      const vrBtn = document.querySelector('a-enter-vr-button');
+      if (vrBtn) vrBtn.remove();
+    });
+  </script>
 </body>
 </html>
