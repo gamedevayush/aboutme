@@ -1,138 +1,25 @@
-<!DOCTYPE html>
+
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <style>
-      body, html {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        background: transparent;
-      }
-
-      #debug-overlay {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        max-height: 30vh;
-        overflow-y: auto;
-        background: rgba(0, 0, 0, 0.7);
-        color: lime;
-        font-family: monospace;
-        font-size: 13px;
-        padding: 6px 10px;
-        z-index: 9999;
-        pointer-events: none;
-      }
-    </style>
   </head>
-
   <body>
-    <a-scene
-      mindar-image="imageTargetSrc: target.mind;"
-      color-space="sRGB"
-      renderer="colorManagement: true, physicallyCorrectLights"
-      vr-mode-ui="enabled: false"
-      device-orientation-permission-ui="enabled: true"
-    >
-      <!-- Assets -->
+    <a-scene mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       <a-assets>
-        <img id="card" src="image.jpg" />
-        <a-asset-item id="avatarModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/softmind/scene.gltf"></a-asset-item>
+	<img id="card" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.png" />
+	<a-asset-item id="avatarModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/softmind/scene.gltf"></a-asset-item>
       </a-assets>
 
-      <!-- MindAR Camera -->
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- 🔹 Invisible Listener for Events -->
-      <a-entity mindar-image-target="targetIndex: 0" marker-events visible="false"></a-entity>
-
-      <!-- 🔹 Tracked Version -->
-      <a-entity id="on-marker" mindar-image-target="targetIndex: 0">
-        <a-plane src="#card" position="0 0 0" height="0.55" width="1"></a-plane>
-        <a-gltf-model src="#avatarModel" position="0 0 0.1" scale="0.1 0.1 0.1"
-          animation="property: position; to: 0 0.1 0.1; dur: 1000; dir: alternate; loop: true;">
-        </a-gltf-model>
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-plane src="#card" position="0 0 0" height="0.552" width="1" rotation="0 0 0"></a-plane>
+        <a-gltf-model rotation="0 0 0 " position="0 0 0.1" scale="0.005 0.005 0.005" src="#avatarModel"
+          animation="property: position; to: 0 0.1 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate"
+        >
       </a-entity>
-
-      <!-- 🔹 Centered Version (No Tracking) -->
-      <a-entity id="in-center" visible="false" position="0 1.6 -2">
-        <a-plane src="#card" position="0 0 0" height="0.55" width="1"></a-plane>
-        <a-gltf-model src="#avatarModel" position="0 0 0.1" scale="0.005 0.005 0.005"
-          animation="property: position; to: 0 0.1 0.1; dur: 1000; dir: alternate; loop: true;">
-        </a-gltf-model>
-      </a-entity>
-
     </a-scene>
-
-    <!-- Debug Console -->
-    <div id="debug-overlay"></div>
-
-    <!-- Marker Logic Script -->
-    <script>
-      function logMsg(msg, level = "log") {
-        const overlay = document.getElementById("debug-overlay");
-        console[level](msg);
-        if (overlay) {
-          const div = document.createElement("div");
-          div.textContent = msg;
-          div.style.color =
-            level === "warn" ? "yellow" :
-            level === "error" ? "red" : "lime";
-          overlay.appendChild(div);
-          overlay.scrollTop = overlay.scrollHeight;
-        }
-      }
-
-      AFRAME.registerComponent("marker-events", {
-        init: function () {
-          const marker = this.el;
-
-          this.el.sceneEl.addEventListener("arReady", () => {
-            logMsg("📸 AR Ready");
-          });
-
-          marker.addEventListener("targetFound", () => {
-            logMsg("✅ Marker Found");
-            showOnMarker();
-          });
-
-          marker.addEventListener("targetLost", () => {
-            logMsg("❌ Marker Lost", "warn");
-            showInCenter();
-          });
-        }
-      });
-
-      function showOnMarker() {
-        document.getElementById("on-marker").setAttribute("visible", true);
-        document.getElementById("in-center").setAttribute("visible", false);
-        logMsg("📌 Showing tracked version");
-      }
-
-      function showInCenter() {
-        document.getElementById("on-marker").setAttribute("visible", false);
-        document.getElementById("in-center").setAttribute("visible", true);
-        logMsg("📦 Showing center version (no tracking)");
-      }
-
-      window.addEventListener("DOMContentLoaded", () => {
-        logMsg("🟡 DOM Loaded - Waiting for MindAR to init...", "warn");
-        if (AFRAME) {
-          logMsg("📦 A-Frame version: " + AFRAME.version);
-        } else {
-          logMsg("❌ A-Frame not loaded", "error");
-        }
-
-        if (AFRAME.components["mindar-image-target"]) {
-          logMsg("🧠 MindAR component registered ✅");
-        } else {
-          logMsg("❌ MindAR image-target component missing", "error");
-        }
-      });
-    </script>
   </body>
 </html>
