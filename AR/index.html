@@ -1,128 +1,138 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html>
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | Web_AR</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <style>
+      body, html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: transparent;
+      }
+
+      #debug-overlay {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-height: 30vh;
+        overflow-y: auto;
+        background: rgba(0, 0, 0, 0.7);
+        color: lime;
+        font-family: monospace;
+        font-size: 13px;
+        padding: 6px 10px;
+        z-index: 9999;
+        pointer-events: none;
+      }
+    </style>
   </head>
+
   <body>
-    <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
-      <div id="unity-loading-bar">
-        <div id="unity-progress-bar-empty">
-          <div id="unity-progress-bar-full"></div>
-        </div>
-      </div>
-      <div id="unity-warning"> </div>
-      <div id="unity-footer">
-        <div id="unity-fullscreen-button"></div>
-      </div>
-    </div>
+    <a-scene
+      mindar-image="imageTargetSrc: target.mind;"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: true"
+    >
+      <!-- Assets -->
+      <a-assets>
+        <img id="card" src="image.jpg" />
+        <a-asset-item id="avatarModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/softmind/scene.gltf"></a-asset-item>
+      </a-assets>
+
+      <!-- MindAR Camera -->
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <!-- 🔹 Invisible Listener for Events -->
+      <a-entity mindar-image-target="targetIndex: 0" marker-events visible="false"></a-entity>
+
+      <!-- 🔹 Tracked Version -->
+      <a-entity id="on-marker" mindar-image-target="targetIndex: 0">
+        <a-plane src="#card" position="0 0 0" height="0.55" width="1"></a-plane>
+        <a-gltf-model src="#avatarModel" position="0 0 0.1" scale="0.1 0.1 0.1"
+          animation="property: position; to: 0 0.1 0.1; dur: 1000; dir: alternate; loop: true;">
+        </a-gltf-model>
+      </a-entity>
+
+      <!-- 🔹 Centered Version (No Tracking) -->
+      <a-entity id="in-center" visible="false" position="0 1.6 -2">
+        <a-plane src="#card" position="0 0 0" height="0.55" width="1"></a-plane>
+        <a-gltf-model src="#avatarModel" position="0 0 0.1" scale="0.005 0.005 0.005"
+          animation="property: position; to: 0 0.1 0.1; dur: 1000; dir: alternate; loop: true;">
+        </a-gltf-model>
+      </a-entity>
+
+    </a-scene>
+
+    <!-- Debug Console -->
+    <div id="debug-overlay"></div>
+
+    <!-- Marker Logic Script -->
     <script>
-
-      var container = document.querySelector("#unity-container");
-      var canvas = document.querySelector("#unity-canvas");
-      var loadingBar = document.querySelector("#unity-loading-bar");
-      var progressBarFull = document.querySelector("#unity-progress-bar-full");
-      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
-      var warningBanner = document.querySelector("#unity-warning");
-
-      // Shows a temporary message banner/ribbon for a few seconds, or
-      // a permanent error message on top of the canvas if type=='error'.
-      // If type=='warning', a yellow highlight color is used.
-      // Modify or remove this function to customize the visually presented
-      // way that non-critical warnings and error messages are presented to the
-      // user.
-      function unityShowBanner(msg, type) {
-        function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+      function logMsg(msg, level = "log") {
+        const overlay = document.getElementById("debug-overlay");
+        console[level](msg);
+        if (overlay) {
+          const div = document.createElement("div");
+          div.textContent = msg;
+          div.style.color =
+            level === "warn" ? "yellow" :
+            level === "error" ? "red" : "lime";
+          overlay.appendChild(div);
+          overlay.scrollTop = overlay.scrollHeight;
         }
-        var div = document.createElement('div');
-        div.innerHTML = msg;
-        warningBanner.appendChild(div);
-        if (type == 'error') div.style = 'background: red; padding: 10px;';
-        else {
-          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-          setTimeout(function() {
-            warningBanner.removeChild(div);
-            updateBannerVisibility();
-          }, 5000);
-        }
-        updateBannerVisibility();
       }
 
-      var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/htdocs.loader.js";
-      var config = {
-        dataUrl: buildUrl + "/htdocs.data.unityweb",
-        frameworkUrl: buildUrl + "/htdocs.framework.js.unityweb",
-        codeUrl: buildUrl + "/htdocs.wasm.unityweb",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "Web_AR",
-        productVersion: "0.1.0",
-        showBanner: unityShowBanner,
-      };
+      AFRAME.registerComponent("marker-events", {
+        init: function () {
+          const marker = this.el;
 
-      // By default, Unity keeps WebGL canvas render target size matched with
-      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-      // Set this to false if you want to decouple this synchronization from
-      // happening inside the engine, and you would instead like to size up
-      // the canvas DOM size and WebGL render target sizes yourself.
-      // config.matchWebGLToCanvasSize = false;
+          this.el.sceneEl.addEventListener("arReady", () => {
+            logMsg("📸 AR Ready");
+          });
 
-      // If you would like all file writes inside Unity Application.persistentDataPath
-      // directory to automatically persist so that the contents are remembered when
-      // the user revisits the site the next time, uncomment the following line:
-      // config.autoSyncPersistentDataPath = true;
-      // This autosyncing is currently not the default behavior to avoid regressing
-      // existing user projects that might rely on the earlier manual
-      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
-      // expected to change.
+          marker.addEventListener("targetFound", () => {
+            logMsg("✅ Marker Found");
+            showOnMarker();
+          });
 
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
+          marker.addEventListener("targetLost", () => {
+            logMsg("❌ Marker Lost", "warn");
+            showInCenter();
+          });
+        }
+      });
 
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-        container.className = "unity-mobile";
-        canvas.className = "unity-mobile";
-
-        // To lower canvas resolution on mobile devices to gain some
-        // performance, uncomment the following line:
-        // config.devicePixelRatio = 1;
-
-
-      } else {
-        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
+      function showOnMarker() {
+        document.getElementById("on-marker").setAttribute("visible", true);
+        document.getElementById("in-center").setAttribute("visible", false);
+        logMsg("📌 Showing tracked version");
       }
 
-      loadingBar.style.display = "block";
+      function showInCenter() {
+        document.getElementById("on-marker").setAttribute("visible", false);
+        document.getElementById("in-center").setAttribute("visible", true);
+        logMsg("📦 Showing center version (no tracking)");
+      }
 
-      var script = document.createElement("script");
-      script.src = loaderUrl;
-      script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
-          progressBarFull.style.width = 100 * progress + "%";
-              }).then((unityInstance) => {
-                loadingBar.style.display = "none";
-                fullscreenButton.onclick = () => {
-                  unityInstance.SetFullscreen(1);
-                };
-              }).catch((message) => {
-                alert(message);
-              });
-            };
+      window.addEventListener("DOMContentLoaded", () => {
+        logMsg("🟡 DOM Loaded - Waiting for MindAR to init...", "warn");
+        if (AFRAME) {
+          logMsg("📦 A-Frame version: " + AFRAME.version);
+        } else {
+          logMsg("❌ A-Frame not loaded", "error");
+        }
 
-      document.body.appendChild(script);
-
+        if (AFRAME.components["mindar-image-target"]) {
+          logMsg("🧠 MindAR component registered ✅");
+        } else {
+          logMsg("❌ MindAR image-target component missing", "error");
+        }
+      });
     </script>
   </body>
 </html>
