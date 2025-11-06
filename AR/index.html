@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AR Indexer — Portal</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%2331ffe7'/></svg>">
+<style>
+  :root{
+    --bg:#03040a;
+    --panel:#071028;
+    --accent1:#31ffe7;
+    --accent2:#7c5cff;
+    --muted:rgba(255,255,255,0.75);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%; margin:0; font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial; background: radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,0.06), transparent), linear-gradient(180deg,#02030a 0%, #050617 60%); color:#eaf8ff}
+  .container{max-width:1080px; margin:4vh auto; padding:28px; position:relative}
+  header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{
+    width:58px;height:58px;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent1),var(--accent2));
+    box-shadow:0 8px 30px rgba(124,92,255,0.18),0 0 18px rgba(49,255,231,0.12);
+    display:flex;align-items:center;justify-content:center;font-weight:800;color:#021;
+    font-family:Inter,system-ui; letter-spacing:1px;
+  }
+  .title{font-size:18px;font-weight:800; letter-spacing:1px}
+  .subtitle{font-size:12px;color:var(--muted)}
+  .search-row{display:flex; gap:10px; flex:1; margin-left:18px}
+  .search-row input{
+    flex:1;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.08));
+    color:var(--muted); outline:none; box-shadow:0 6px 30px rgba(0,0,0,0.6) inset;
+  }
+  .search-row button{
+    padding:12px 16px;border-radius:12px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:#021;font-weight:700; cursor:pointer;
+  }
+
+  .panel{
+    margin-top:14px;padding:22px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12));
+    border:1px solid rgba(124,92,255,0.06); box-shadow: 0 10px 40px rgba(2,3,10,0.6);
+    backdrop-filter: blur(8px) saturate(120%);
+  }
+
+  .grid{display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:18px}
+  .card{
+    position:relative;padding:18px;border-radius:14px;background:linear-gradient(180deg, rgba(124,92,255,0.04), rgba(49,255,231,0.02));
+    border:1px solid rgba(255,255,255,0.03); cursor:pointer; transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .card:hover{ transform:translateY(-6px) scale(1.01); box-shadow:0 18px 50px rgba(12,12,30,0.6)}
+  .icon{
+    width:56px;height:56px;border-radius:12px; display:flex;align-items:center;justify-content:center;font-weight:800;
+    color:#021; background:linear-gradient(135deg,var(--accent1),var(--accent2)); box-shadow:0 8px 24px rgba(124,92,255,0.12);
+  }
+  .card h3{margin:12px 0 6px;font-size:18px}
+  .card p{margin:0;color:var(--muted); font-size:13px}
+
+  .kbd{font-family:monospace;background:#011220;border-radius:6px;padding:6px 8px;font-size:13px;color:var(--muted);border:1px solid rgba(255,255,255,0.02)}
+
+  footer{margin-top:18px; display:flex;align-items:center;justify-content:space-between; gap:12px; color:var(--muted); font-size:13px}
+  .credit{font-weight:700;color:var(--accent1); text-shadow:0 0 8px rgba(49,255,231,0.08)}
+
+  /* subtle AR scan lines */
+  .scan {position:fixed; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01) 1px, transparent 2px); mix-blend-mode:overlay; opacity:0.45}
+  /* responsive */
+  @media (max-width:540px){
+    .brand .title{font-size:15px} .search-row input{padding:10px} .logo{width:48px;height:48px}
+  }
+</style>
+</head>
+<body>
+<div class="scan" aria-hidden="true"></div>
+
+<div class="container">
+  <header>
+    <div class="brand">
+      <div class="logo">AYU</div>
+      <div>
+        <div class="title">AYU · AR Index</div>
+        <div class="subtitle">Local quick-access — open pages from the same folder</div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:12px; width:48%">
+      <div class="search-row" style="width:100%">
+        <input id="q" placeholder="Type name (gym / doctor / yoga / real / teacher) and press Enter" />
+        <button id="searchBtn">Go</button>
+      </div>
+      <div class="kbd">/ to focus</div>
+    </div>
+  </header>
+
+  <main class="panel" role="main">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-weight:800">Jump to</div>
+      <div style="color:var(--muted);font-size:13px">Redirects to local files in the same folder (e.g. <code>doctors.html</code>)</div>
+    </div>
+
+    <div class="grid" id="grid">
+      <!-- cards -->
+      <div class="card" data-target="Gym/index.html" tabindex="0" role="button" aria-pressed="false">
+        <div class="icon">💪</div>
+        <h3>Gym</h3>
+        <p>Training halls, trainers and equipment. Open <strong>Gym</strong></p>
+      </div>
+
+      <div class="card" data-target="Doctor/index.html" tabindex="0" role="button" aria-pressed="false">
+        <div class="icon">🩺</div>
+        <h3>Doctor</h3>
+        <p>Find clinics and specialists. Open <strong>Doctor</strong></p>
+      </div>
+
+      <div class="card" data-target="Yoga/index.html" tabindex="0" role="button" aria-pressed="false">
+        <div class="icon">🧘‍♀️</div>
+        <h3>Yoga</h3>
+        <p>Calm zones, trainers, and classes. Open <strong>Yoga</strong></p>
+      </div>
+
+      <div class="card" data-target="RealEstate/index.html" tabindex="0" role="button" aria-pressed="false">
+        <div class="icon">🏘️</div>
+        <h3>Real Estate</h3>
+        <p>Properties and agents. Open <strong>Real Estate</strong></p>
+      </div>
+
+      <div class="card" data-target="Teacher/index.html" tabindex="0" role="button" aria-pressed="false">
+        <div class="icon">📚</div>
+        <h3>Teacher</h3>
+        <p>Find tutors, courses and classes. Open <strong>Teacher</strong></p>
+      </div>
+    </div>
+
+    <footer>
+      <div>Tip: Use <kbd>↑/↓</kbd> to move, <kbd>Enter</kbd> to open — or click a card.</div>
+      <div class="credit">Created with AYUSH SINGH</div>
+    </footer>
+  </main>
+</div>
+
+<script>
+  // Basic keyboard & navigation + local-file relative redirect
+  (function(){
+    const cards = Array.from(document.querySelectorAll('.card'));
+    const qInput = document.getElementById('q');
+    const searchBtn = document.getElementById('searchBtn');
+    let idx = 0;
+
+    function focusCard(i){
+      if(!cards.length) return;
+      idx = (i + cards.length) % cards.length;
+      cards.forEach(c => c.classList.remove('active'));
+      const el = cards[idx];
+      el.classList.add('active');
+      el.focus({preventScroll:true});
+    }
+
+    // click/enter handler
+    function goTo(targetFile){
+      // Compose absolute URL based on current file's folder
+      const cur = window.location.href;
+      const base = cur.substring(0, cur.lastIndexOf('/') + 1);
+      // Ensure no leading slash on target
+      const t = targetFile.replace(/^\/+/, '');
+      // If the user accidentally passed with or without .html, keep it
+      const final = base + t;
+      window.location.href = final;
+    }
+
+    // Attach click + keyboard
+    cards.forEach((c, i) => {
+      c.addEventListener('click', () => goTo(c.dataset.target));
+      c.addEventListener('keydown', (ev) => {
+        if(ev.key === 'Enter' || ev.key === ' ') goTo(c.dataset.target);
+      });
+    });
+
+    // Search action: fuzzy simple matching
+    function searchAction(){
+      const q = (qInput.value || '').trim().toLowerCase();
+      if(!q) return focusCard(0);
+      // mapping synonyms
+      const mapping = {
+        gym: 'gym.html',
+        gymnasium: 'gym.html',
+        doctor: 'doctors.html',
+        doctors: 'doctors.html',
+        doc: 'doctors.html',
+        yoga: 'yoga.html',
+        real: 'real-estate.html',
+        estate: 'real-estate.html',
+        realestate: 'real-estate.html',
+        property: 'real-estate.html',
+        teacher: 'teacher.html',
+        tutor: 'teacher.html',
+        teaching: 'teacher.html'
+      };
+      // direct map
+      for(const k in mapping){
+        if(q === k || q.startsWith(k) || q.includes(k)){
+          return goTo(mapping[k]);
+        }
+      }
+      // fallback: try to match by card label text
+      const found = cards.find(c => c.textContent.toLowerCase().includes(q));
+      if(found) return goTo(found.dataset.target);
+      // nothing matched - flash input
+      qInput.animate([{boxShadow:'0 0 0 0 rgba(255,70,70,0.0)'},{boxShadow:'0 0 0 6px rgba(255,70,70,0.12)'}],{duration:420});
+    }
+
+    searchBtn.addEventListener('click', searchAction);
+    qInput.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter') searchAction();
+    });
+
+    // global hotkeys
+    window.addEventListener('keydown', (e) => {
+      if(e.key === '/' && document.activeElement !== qInput){
+        e.preventDefault(); qInput.focus(); qInput.select();
+      }
+      if(e.key === 'ArrowDown' || e.key === 'j'){ e.preventDefault(); focusCard(idx+1); }
+      if(e.key === 'ArrowUp' || e.key === 'k'){ e.preventDefault(); focusCard(idx-1); }
+      if(e.key === 'Enter' && document.activeElement.classList.contains('card')){
+        e.preventDefault();
+        const target = document.activeElement.dataset.target; if(target) goTo(target);
+      }
+    });
+
+    // initial focus
+    focusCard(0);
+
+    // Accessibility: allow tab to land on cards nicely
+    document.addEventListener('focusin', (e)=>{
+      const i = cards.indexOf(e.target);
+      if(i >= 0) idx = i;
+    });
+  })();
+</script>
+</body>
+</html>
